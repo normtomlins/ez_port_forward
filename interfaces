@@ -1,0 +1,20 @@
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+        address 107.xxx.xx.xx/25
+        gateway 107.xxx.xxx.xxx
+        dns-nameservers 8.8.8.8 8.8.4.4
+
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.1/24
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
+    post-up   iptables -t nat -A POSTROUTING -s '192.168.1.0/24' -o eth0 -j MASQUERADE
+    post-down iptables -t nat -D POSTROUTING -s '192.168.1.0/24' -o eth0 -j MASQUERADE
+    post-up echo 1 > /proc/sys/net/ipv4/ip_forward
