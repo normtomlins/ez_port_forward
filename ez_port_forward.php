@@ -42,7 +42,7 @@ function parse_ssh_rule($ssh_rule, $container_id) {
 function parse_http_rule($http_rule, $container_id) {
     if ($http_rule === true) {
         // Default HTTP port: container_id * 100 + 80
-        return [(int)($container_id * 100 + 80) => 80];
+        return [(int)(8000 + $container_id ) => 80];
     }
     if (is_int($http_rule)) {
         return [(int)($container_id * 100 + $http_rule) => $http_rule];
