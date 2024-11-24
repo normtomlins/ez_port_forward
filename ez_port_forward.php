@@ -13,20 +13,31 @@ function parse_yaml($yaml_file) {
 }
 
 function parse_ports($ports) {
+    if (is_int($ports)) {
+        // Single port as integer
+        return [$ports => $ports];
+    }
     if (is_string($ports)) {
-        $port_list = explode(',', $ports);
-        $result = [];
-        foreach ($port_list as $port) {
-            $port = trim($port);
-            $result[$port] = $port;
+        if (strpos($ports, ',') !== false) {
+            // Comma-separated list of ports
+            $port_list = explode(',', $ports);
+            $result = [];
+            foreach ($port_list as $port) {
+                $port = trim($port);
+                $result[$port] = $port;
+            }
+            return $result;
         }
-        return $result;
+        // Single port as string
+        return [$ports => $ports];
     }
     if (is_array($ports)) {
+        // Already in the correct format
         return $ports;
     }
-    return null;
+    return null; // If the input is invalid, return null
 }
+
 
 function parse_ssh_rule($ssh_rule, $container_id) {
     if ($ssh_rule === true) {
