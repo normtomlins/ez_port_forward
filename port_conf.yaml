@@ -1,5 +1,5 @@
 vmbr0:
-  bridge: eno1
+  bridge: eth0
   subnet: 192.168.1.0/24
   forwards:
     101:
