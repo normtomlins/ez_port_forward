@@ -65,7 +65,7 @@ function parse_rtp_rule($rtp_rule, $container_id) {
     if ($rtp_rule === true) {
         // Correct range calculation for RTP
         $start_port = 10000 + ($container_id * 100);
-        $end_port = $start_port + 999;
+        $end_port = $start_port + 99;
         return ["$start_port:$end_port" => "$start_port:$end_port"];
     }
     return null;
@@ -73,6 +73,10 @@ function parse_rtp_rule($rtp_rule, $container_id) {
 
 function build_command($protocol, $bridge, $target_ip, $source_range, $target_range = null) {
     if (!$target_range) $target_range = $source_range;
+
+    // Replace ":" with "-" in the destination range for iptables
+    $target_range = str_replace(':', '-', $target_range);
+
     return "        post-up iptables -t nat -A PREROUTING -i $bridge -p $protocol --dport $source_range -j DNAT --to $target_ip:$target_range\n";
 }
 
@@ -163,7 +167,7 @@ function write_iptables_file($yaml_dict, $out_file) {
             $rtp = parse_rtp_rule($cont_conf['rtp'] ?? null, $cont_id);
             $tcp = parse_ports($cont_conf['tcp'] ?? null);
             $udp = parse_ports($cont_conf['udp'] ?? null);
-            $tcpudp = parse_ports($cont_conf['tcpudp'] ?? null);
+	    $tcpudp = parse_ports($cont_conf['tcpudp'] ?? $cont_conf['udptcp'] ?? null);
 
             write_container_commands($file, $container_ip, $bridge, $ssh, $http, $rtp, $tcp, $udp, $tcpudp);
         }
